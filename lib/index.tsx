@@ -433,7 +433,7 @@ const ImageTools: React.FC<IProps> = ({
           </div>
           {!isFinished && (
             <div
-              className="location"
+              className="tools-location"
               ref={locationBoxRef}
               onMouseMove={handleLocMove}
             >

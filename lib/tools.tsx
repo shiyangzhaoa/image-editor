@@ -22,7 +22,7 @@ const Tools = forwardRef<HTMLDivElement, IProps>(({ info, onChange, onClose, typ
 	const combinedRef = useCombinedRefs(ref, toolsRef) as any;
 	const handleClick = (type: string) => {
 		const pos = (combinedRef.current as HTMLDivElement).getBoundingClientRect();
-		if (pos.bottom >= window.innerHeight - pos.height - 10) {
+		if (pos.bottom >= window.innerHeight - pos.height - 5) {
 			setPosition('top');
 		} else {
 			setPosition('bottom');
@@ -42,16 +42,20 @@ const Tools = forwardRef<HTMLDivElement, IProps>(({ info, onChange, onClose, typ
 				align="start"
 				isOpen={selected === 'rect'}
 				content={({ position, targetRect, popoverRect }) => (
-          <ArrowContainer
-            position={position}
-            targetRect={targetRect}
-            popoverRect={popoverRect}
-            arrowColor={'#272323'}
-            arrowSize={5}
-          >
-						<Stroke info={info} onChange={(options) => setInfo((opt) => ({ ...opt, ...options }))} />
+					<ArrowContainer
+						position={position}
+						targetRect={targetRect}
+						popoverRect={popoverRect}
+						arrowColor={'#272323'}
+						arrowSize={5}
+					>
+						<Stroke
+							info={info}
+							onChange={(options) =>
+								setInfo((opt: { size?: number; color?: string }) => ({ ...opt, ...options }))}
+						/>
 					</ArrowContainer>
-        )}
+				)}
 			>
 				<div
 					className={cx('tools-item tools-rect', { 'tool-selected': type === 'rect' })}
@@ -61,29 +65,57 @@ const Tools = forwardRef<HTMLDivElement, IProps>(({ info, onChange, onClose, typ
 			<Popover
 				position={position}
 				align="start"
-        isOpen={selected === 'circle'}
-        content={({ position, targetRect, popoverRect }) => (
-          <ArrowContainer
-            position={position}
-            targetRect={targetRect}
-            popoverRect={popoverRect}
-            arrowColor={'#272323'}
-            arrowSize={5}
-          >
-						<Stroke info={info} onChange={(options) => setInfo((opt) => ({ ...opt, ...options }))} />
+				isOpen={selected === 'circle'}
+				content={({ position, targetRect, popoverRect }) => (
+					<ArrowContainer
+						position={position}
+						targetRect={targetRect}
+						popoverRect={popoverRect}
+						arrowColor={'#272323'}
+						arrowSize={5}
+					>
+						<Stroke
+							info={info}
+							onChange={(options) =>
+								setInfo((opt: { size?: number; color?: string }) => ({ ...opt, ...options }))}
+						/>
 					</ArrowContainer>
-        )}
+				)}
 			>
 				<div
 					className={cx('tools-item tools-circle', { 'tool-selected': type === 'circle' })}
 					onClick={() => handleClick('circle')}
 				/>
 			</Popover>
-			<div className="tools-item tools-text">笔</div>
-			<div className="tools-item tools-text">码</div>
+      <Popover
+				position={position}
+				align="start"
+				isOpen={selected === 'line'}
+				content={({ position, targetRect, popoverRect }) => (
+					<ArrowContainer
+						position={position}
+						targetRect={targetRect}
+						popoverRect={popoverRect}
+						arrowColor={'#272323'}
+						arrowSize={5}
+					>
+						<Stroke
+							info={info}
+							onChange={(options) =>
+								setInfo((opt: { size?: number; color?: string }) => ({ ...opt, ...options }))}
+						/>
+					</ArrowContainer>
+				)}
+			>
+        <div
+          className={cx('tools-item tools-text', { 'tool-selected': type === 'line' })}
+          onClick={() => handleClick('line')}
+        >L</div>
+			</Popover>
+			<div className="tools-item tools-text">M</div>
 			<div className="hold" />
-			<div className="tools-item tools-text">撤</div>
-			<div className="tools-item tools-text">S</div>
+			<div className="tools-item tools-text">C</div>
+			<div className="tools-item tools-text">D</div>
 			<div className="tools-item close" onClick={handleClose}>
 				X
 			</div>

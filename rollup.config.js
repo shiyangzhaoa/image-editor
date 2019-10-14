@@ -77,10 +77,7 @@ export default {
     less({
       insert: "true",
       options: {
-        javascriptEnabled: true,
-        modifyVars: { //Ant design style overrides
-          "@primary-color": "#BADA55"
-        }
+        javascriptEnabled: true
       }
     }),
   ]

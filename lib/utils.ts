@@ -49,11 +49,11 @@ export const getWidthAndHeight = (
 
 /** 获取鼠标坐标, 相对 canvas */
 export const windowToCanvas = (ele: HTMLElement, x: number, y: number) => {
-	const box = ele.getBoundingClientRect();
+  const box = ele.getBoundingClientRect();
 
 	return {
-		x: x - box.left,
-		y: y - box.top
+		x: x > box.right ? box.width : x - box.left,
+		y: y > box.bottom ? box.height - box.top : y - box.top
 	};
 };
 
@@ -211,7 +211,7 @@ export const useCombinedRefs = (...refs: any) => {
 };
 
 export const drawHorizontalLine = (context: CanvasRenderingContext2D) => {
-	context.strokeStyle = '#578e04';
+	context.strokeStyle = '#30ca30';
 	context.lineWidth = 1;
 	context.beginPath();
 	context.moveTo(0, context.canvas.height / 2 + 0.5);
@@ -220,7 +220,7 @@ export const drawHorizontalLine = (context: CanvasRenderingContext2D) => {
 };
 
 export const drawVerticalLine = (context: CanvasRenderingContext2D) => {
-	context.strokeStyle = '#578e04';
+	context.strokeStyle = '#30ca30';
 	context.lineWidth = 1;
 	context.beginPath();
 	context.moveTo(context.canvas.width / 2 + 0.5, 0);
@@ -243,10 +243,10 @@ export const drawLocCanvas = ({
 	ratioRef: React.RefObject<any>;
 	size?: number;
 }) => {
-	const context = ele.getContext('2d') as CanvasRenderingContext2D;
-	ele.width = 100;
-	ele.height = 100;
-	const boxLoc = box.getBoundingClientRect();
+  const context = ele.getContext('2d') as CanvasRenderingContext2D;
+  const boxLoc = box.getBoundingClientRect();
+	ele.width = size * 10;
+  ele.height = size * 10;
 	if (loc.x >= window.innerWidth - boxLoc.width - 16) {
 		box.style.left = `${loc.x - boxLoc.width - 16}px`;
 	} else {
@@ -280,7 +280,7 @@ export const drawSvg = (firstLoc: ILoc, lastLoc: ILoc, rectEle: SVGElement) => {
 	rectEle.style.left = `${x}px`;
 	rectEle.style.top = `${y}px`;
 
-	return [ w, h ];
+	return [w, h];
 };
 
 export const drawSvgOnCanvas = (
@@ -291,12 +291,13 @@ export const drawSvgOnCanvas = (
 	ratio: number,
 	info: { size: number; color: string }
 ) => {
-	const [ x, y, w, h ] = getLocInfo(firstLoc, lastLoc);
+	const [x, y, w, h] = getLocInfo(firstLoc, lastLoc);
 
 	const draw = () => {
 		context.beginPath();
 		const linW = info.size / 2;
 		if (type === 'rect') {
+      context.lineJoin = 'round';
 			context.rect(x * ratio + linW, y * ratio + linW, w * ratio - info.size, h * ratio - info.size);
 		} else {
 			context.ellipse(x * ratio + w / 2 * ratio, y * ratio + h / 2 * ratio, w / 2 * ratio, h / 2 * ratio, 0, 0, 2 * Math.PI);
@@ -311,3 +312,20 @@ export const drawSvgOnCanvas = (
 
 	return draw;
 };
+
+export const drawLine = (
+  lastLoc: ILoc,
+  curLoc: ILoc,
+  context: CanvasRenderingContext2D,
+  ratio: number,
+	info: { size: number; color: string }
+) => {
+  context.beginPath();
+  context.moveTo(lastLoc.x * ratio,lastLoc.y * ratio);
+  context.lineTo(curLoc.x * ratio,curLoc.y * ratio);
+  context.lineWidth = info.size * ratio;
+  context.strokeStyle = info.color;
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.stroke();
+}

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { forwardRef, useRef, useEffect, useState } from 'react';
 
-import { useCombinedRefs, windowToCanvas, drawSvg, drawSvgOnCanvas } from './utils';
+import { useCombinedRefs, windowToCanvas, drawSvg, drawSvgOnCanvas, ILoc, drawLine } from './utils';
 import Svg from './Svg';
 import Tools from './tools';
 
@@ -40,11 +40,11 @@ const Canvas = forwardRef<any, IProps>(
     const rectRef = useRef<SVGElement>(null);
     const infoRef = useRef<{ size: number, color: string }>({size: 4, color: '#f1f117'});
     const handleChange = (type: string) => {
+      const canvasEle = combinedRef.current as HTMLCanvasElement;
       handleSelect(true);
       setType(type);
 
       if (type === 'rect' || type === 'circle') {
-        const canvasEle = combinedRef.current as HTMLCanvasElement;
         canvasEle.onmousedown = event => {
           const firstLoc = windowToCanvas(
             canvasEle,
@@ -82,6 +82,26 @@ const Canvas = forwardRef<any, IProps>(
               ...actionsRef.current,
               drawSvgOnCanvas(type, firstLoc, curLoc, context, ratio, infoRef.current)
             ];
+            canvasEle.onmousemove = null;
+            document.onmouseup = null;
+          };
+        };
+
+        return;
+      }
+
+      if (type === 'line') {
+        let lastLoc: ILoc;
+        canvasEle.onmousedown = event => {
+          lastLoc = windowToCanvas(canvasEle, event.clientX, event.clientY);
+          canvasEle.onmousemove = moveEvent => {
+            const curLoc = windowToCanvas(canvasEle, moveEvent.clientX, moveEvent.clientY);
+            const context = canvasEle.getContext('2d') as CanvasRenderingContext2D;
+            drawLine(lastLoc, curLoc, context, ratio, info);
+            lastLoc = curLoc;
+          };
+
+          document.onmouseup = () => {
             canvasEle.onmousemove = null;
             document.onmouseup = null;
           };

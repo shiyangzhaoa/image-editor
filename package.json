@@ -1,5 +1,5 @@
 {
-  "name": "image-editor",
+  "name": "image-editor-little",
   "version": "0.1.0",
   "description": "Image Editor",
   "main": "dist/lib.js",
@@ -7,6 +7,7 @@
   "files": [
     "dist"
   ],
+  "keywords": ["image", "react", "image-editor"],
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
