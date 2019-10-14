@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "es5",
+    "lib": ["es5", "es6", "dom"],
+    "jsx": "react"
+  },
+  "include": ["./lib/**/*", "./react.d.ts"]
+}

@@ -1,0 +1,27 @@
+{
+  "defaultSeverity": "error",
+  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+  "jsRules": { "no-empty": true },
+  "rules": {
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "allow-pascal-case",
+      "allow-leading-underscore"
+    ],
+    "jsx-no-lambda": false,
+    "jsx-boolean-value": [true, "never"],
+    "no-bitwise": false,
+    "no-console": false,
+    "trailing-comma": true,
+    "max-classes-per-file": [true, 2],
+    "object-literal-sort-keys": false,
+    "interface-name": false
+  },
+  "linterOptions": {
+    "exclude": [
+      "dist/**/*.js",
+      "node_modules/**/*.*"
+    ]
+  }
+}

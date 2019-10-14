@@ -1,0 +1,7 @@
+﻿.rpt2_cache/*
+dist
+node_modules
+yarn-error.log*
+rollup.build.css*
+.idea/
+.*_cache*
