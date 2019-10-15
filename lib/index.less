@@ -48,6 +48,10 @@
     width: 300px;
     height: 40px;
     right: -99999px;
+
+    svg {
+      cursor: pointer;
+    }
   }
   
   .tools-text {
@@ -64,16 +68,7 @@
     border-radius: 50%;
   }
   
-  .close {
-    font-size: 20px;
-    color: red;
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
-    text-align: center;
-  }
-  
-  .hold {
+  .tools-hold {
     width: 1px;
     height: 20px;
     background: #403c3c;
@@ -88,6 +83,7 @@
   }
 
   .tool-selected {
+    color: #30ca30;
     border-color: #30ca30;
   }
   
@@ -163,8 +159,9 @@
     border: 1px solid #30ca30;
   }
 
-  .rect {
-    position: absolute
+  .svg-options {
+    position: absolute;
+    left: -99999px;
   }
 }
 

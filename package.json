@@ -1,13 +1,13 @@
 {
   "name": "image-editor-little",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Image Editor",
   "main": "dist/lib.js",
   "module": "dist/lib.es.js",
   "files": [
     "dist"
   ],
-  "keywords": ["image", "react", "image-editor"],
+  "keywords": ["image", "react", "image-editor", "typescript", "component"],
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",

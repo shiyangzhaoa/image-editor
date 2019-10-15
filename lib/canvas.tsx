@@ -1,9 +1,17 @@
 import * as React from 'react';
 import { forwardRef, useRef, useEffect, useState } from 'react';
 
-import { useCombinedRefs, windowToCanvas, drawSvg, drawSvgOnCanvas, ILoc, drawLine } from './utils';
+import {
+  useCombinedRefs,
+  windowToCanvas,
+  realWindowToCanvas,
+  drawSvg,
+  drawSvgOnCanvas,
+  ILoc,
+  drawLine
+} from './utils';
 import Svg from './Svg';
-import Tools from './tools';
+import Tools from './Tools';
 
 interface IProps {
   isFinished: boolean;
@@ -33,71 +41,103 @@ const Canvas = forwardRef<any, IProps>(
     const [type, setType] = useState('');
     const [size, setSize] = useState<[number, number]>([0, 0]);
     const [isEdit, setEdit] = useState(false);
-    const [info, setInfo] = useState<{ size: number, color: string }>({size: 4, color: '#f1f117'});
+    const [info, setInfo] = useState<{ size: number; color: string }>({
+      size: 4,
+      color: '#f1f117'
+    });
     const canvasRef = useRef(null);
     const combinedRef = useCombinedRefs(ref, canvasRef) as any;
     const actionsRef = useRef<any[]>([]);
-    const rectRef = useRef<SVGElement>(null);
-    const infoRef = useRef<{ size: number, color: string }>({size: 4, color: '#f1f117'});
-    const handleChange = (type: string) => {
+    const svgRef = useRef<SVGElement>(null);
+    const infoRef = useRef<{ size: number; color: string }>({
+      size: 4,
+      color: '#f1f117'
+    });
+    const downLoc = useRef<ILoc>({ x: 0, y: 0 });
+    const curInfo = useRef<{ size: number; color: string }>({
+      size: 4,
+      color: '#f1f117'
+    });
+
+    const handleMove = (moveEvent: MouseEvent) => {
+      const svgEle = svgRef.current as SVGElement;
+      const canvasEle = combinedRef.current as HTMLCanvasElement;
+      const curLoc = windowToCanvas(
+        canvasEle,
+        moveEvent.clientX,
+        moveEvent.clientY
+      );
+
+      const [w, h] = drawSvg(downLoc.current, curLoc, svgEle);
+      setSize([w, h]);
+    };
+
+    const handleRemove = (upEvent: MouseEvent, curType: 'rect' | 'circle') => {
+      const canvasEle = combinedRef.current as HTMLCanvasElement;
+      const curLoc = windowToCanvas(
+        canvasEle,
+        upEvent.clientX,
+        upEvent.clientY
+      );
+      const context = canvasEle.getContext('2d') as CanvasRenderingContext2D;
+
+      actionsRef.current = [
+        ...actionsRef.current,
+        drawSvgOnCanvas(
+          curType,
+          downLoc.current,
+          curLoc,
+          context,
+          ratio,
+          infoRef.current
+        )
+      ];
+      canvasEle.onmousemove = null;
+      document.onmouseup = null;
+    };
+
+    const handleChange = (curType: string) => {
       const canvasEle = combinedRef.current as HTMLCanvasElement;
       handleSelect(true);
-      setType(type);
+      setType(curType);
 
-      if (type === 'rect' || type === 'circle') {
+      if (curType === 'rect' || curType === 'circle') {
+        const svgEle = svgRef.current as SVGElement;
         canvasEle.onmousedown = event => {
-          const firstLoc = windowToCanvas(
+          setEdit(true);
+          downLoc.current = windowToCanvas(
             canvasEle,
             event.clientX,
             event.clientY
           );
 
-          canvasEle.onmousemove = moveEvent => {
-            setEdit(true);
-            const canvasEle = combinedRef.current as HTMLCanvasElement;
-            const rectEle = rectRef.current as SVGElement;
-            const curLoc = windowToCanvas(
-              canvasEle,
-              moveEvent.clientX,
-              moveEvent.clientY
-            );
-
-            const [w, h] = drawSvg(firstLoc, curLoc, rectEle);
-            setSize([w, h]);
-          };
+          canvasEle.onmousemove = handleMove;
 
           document.onmouseup = upEvent => {
             setEdit(false);
-            const canvasEle = combinedRef.current as HTMLCanvasElement;
-            const curLoc = windowToCanvas(
-              canvasEle,
-              upEvent.clientX,
-              upEvent.clientY
-            );
-            const context = canvasEle.getContext(
-              '2d'
-            ) as CanvasRenderingContext2D;
-
-            actionsRef.current = [
-              ...actionsRef.current,
-              drawSvgOnCanvas(type, firstLoc, curLoc, context, ratio, infoRef.current)
-            ];
-            canvasEle.onmousemove = null;
-            document.onmouseup = null;
+            handleRemove(upEvent, curType);
+            if (svgEle) svgEle.onmousemove = null;
           };
         };
 
         return;
       }
 
-      if (type === 'line') {
+      if (curType === 'line') {
         let lastLoc: ILoc;
         canvasEle.onmousedown = event => {
           lastLoc = windowToCanvas(canvasEle, event.clientX, event.clientY);
           canvasEle.onmousemove = moveEvent => {
-            const curLoc = windowToCanvas(canvasEle, moveEvent.clientX, moveEvent.clientY);
-            const context = canvasEle.getContext('2d') as CanvasRenderingContext2D;
-            drawLine(lastLoc, curLoc, context, ratio, info);
+            const curLoc = realWindowToCanvas(
+              canvasEle,
+              moveEvent.clientX,
+              moveEvent.clientY
+            );
+            const context = canvasEle.getContext(
+              '2d'
+            ) as CanvasRenderingContext2D;
+            // 原生事件
+            drawLine(lastLoc, curLoc, context, ratio, curInfo.current);
             lastLoc = curLoc;
           };
 
@@ -127,16 +167,33 @@ const Canvas = forwardRef<any, IProps>(
       actionsRef.current = [lastDraw];
     }, [lastDraw]);
 
+    useEffect(() => {
+      if ((type === 'rect' || type === 'circle') && isEdit) {
+        const svgEle = svgRef.current as SVGElement;
+        svgEle.onmousemove = handleMove;
+
+        return () => {
+          svgEle.onmousemove = null;
+        };
+      }
+    }, [type, isEdit, handleMove]);
+
+    useEffect(() => {
+      curInfo.current = info;
+    }, [info]);
+
     return (
       <div className="drag-border">
-        <canvas
-          className="canvas"
-          ref={combinedRef}
-          width="0"
-          height="0"
-        />
+        <canvas className="canvas" ref={combinedRef} width="0" height="0" />
         {(type === 'rect' || type === 'circle') && isEdit && (
-          <Svg ref={rectRef} type={type} width={size[0]} height={size[1]} stroke={info.color} strokeWidth={info.size} />
+          <Svg
+            ref={svgRef}
+            type={type}
+            width={size[0]}
+            height={size[1]}
+            stroke={info.color}
+            strokeWidth={info.size}
+          />
         )}
         {isFinished && !isSelected && (
           <>

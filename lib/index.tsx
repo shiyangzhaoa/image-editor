@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
+import cx from 'classnames';
 
 import {
   ILoc,
@@ -10,8 +11,11 @@ import {
   setToolsLocEffect,
   drawLocCanvas
 } from './utils';
+import { Status } from './constant';
 import './index.less';
-import Canvas from './canvas';
+import Canvas from './Canvas';
+import BlockLoading from './Loading';
+import ImgFailed from './img-failed.svg';
 
 interface IProps {
   /** 如果只是图片 */
@@ -20,8 +24,11 @@ interface IProps {
   width?: number;
   /** 高度 */
   height?: number;
-  /** 改变窗口时改变大小 */
-  shouldResetAfterResize?: boolean;
+  className?: string;
+  locSize: 10;
+  holdSize?: { w: number | string; h: number | string };
+  /** 改变窗口时改变大小, 感觉不需要, 相关代码已经删除 */
+  // shouldResetAfterResize?: boolean;
 }
 
 const image = new Image();
@@ -30,8 +37,10 @@ const ImageTools: React.FC<IProps> = ({
   src,
   width,
   height,
-  shouldResetAfterResize
+  className,
+  holdSize
 }) => {
+  const [status, setStatus] = useState(Status.loading);
   const [size, setSize] = useState<[number, number]>([0, 0]);
   const [isFinished, setFinished] = useState(false);
   const [isSelected, setSelected] = useState(false);
@@ -50,13 +59,6 @@ const ImageTools: React.FC<IProps> = ({
   const locRef = useRef<ILoc>({ x: 0, y: 0 });
   const directionRef = useRef<string | null>('');
 
-  const init = () => {
-    const parentEle = parentRef.current as HTMLDivElement;
-    setFinished(false);
-    setSelected(false);
-    parentEle.style.left = '-999999px';
-  };
-
   const handleLocMove = (event: React.MouseEvent) => {
     const cutEle = cutRef.current as HTMLDivElement;
     const curLoc = windowToCanvas(cutEle, event.clientX, event.clientY);
@@ -66,7 +68,8 @@ const ImageTools: React.FC<IProps> = ({
       box: locationBoxRef.current as HTMLDivElement,
       ele,
       loc: curLoc,
-      ratioRef
+      ratioRef,
+      event
     });
   };
 
@@ -87,15 +90,13 @@ const ImageTools: React.FC<IProps> = ({
       const curSize = getWidthAndHeight(image, width, height);
       setSize(curSize);
       ratioRef.current = image.width / curSize[0];
-    };
-    window.onresize = () => {
-      if (!shouldResetAfterResize) return;
-
-      drawImg();
-      init();
+      setStatus(Status.loaded);
     };
 
     image.onload = drawImg;
+    image.onerror = () => {
+      setStatus(Status.failed);
+    };
 
     return () => {
       window.onresize = null;
@@ -105,9 +106,12 @@ const ImageTools: React.FC<IProps> = ({
 
   useEffect(() => {
     image.src = src;
+    setStatus(Status.loading);
   }, [src]);
 
   useEffect(() => {
+    if (status !== Status.loaded) return;
+
     const cutEle = cutRef.current as HTMLDivElement;
     const puzzleEle = puzzleRef.current as HTMLCanvasElement;
     const parentEle = parentRef.current as HTMLDivElement;
@@ -150,7 +154,8 @@ const ImageTools: React.FC<IProps> = ({
           box: locationBoxRef.current as HTMLDivElement,
           ele,
           loc: lastLoc,
-          ratioRef
+          ratioRef,
+          event
         });
 
         return curDraw;
@@ -178,9 +183,11 @@ const ImageTools: React.FC<IProps> = ({
       cancel();
       cutEle.onmousedown = null;
     };
-  }, [size, isSelected]);
+  }, [size, isSelected, status]);
 
   useEffect(() => {
+    if (status !== Status.loaded) return;
+
     const puzzleEle = puzzleRef.current as HTMLCanvasElement;
 
     if (!puzzleEle) return;
@@ -294,7 +301,7 @@ const ImageTools: React.FC<IProps> = ({
     if (puzzleEle) puzzleEle.style.cursor = '';
 
     return removeMouse;
-  }, [isFinished, size, height]);
+  }, [isFinished, size, height, status]);
 
   const handlePointDown = (
     type: 0 | 1 | 2 | 3,
@@ -409,47 +416,54 @@ const ImageTools: React.FC<IProps> = ({
     };
   };
 
+  if (status === Status.loading) {
+    return (
+      <BlockLoading width={width || holdSize.w} height={height || holdSize.h} />
+    );
+  }
+
+  if (status === Status.failed) {
+    return <ImgFailed />;
+  }
+
   return (
     <div
-      className="image-editor"
-      style={{ height: height || '100vh', width: width || '100vw' }}
+      className={cx('image-editor', className)}
+      style={{ width: width || '100vw', height: height || '100vh' }}
     >
-      {src ? (
-        <div className="img-box">
-          <img src={src} width={size[0]} height={size[1]} alt="加载失败" />
-          <div className="drag-box" ref={cutRef} />
-          <div className="drag-parent" ref={parentRef}>
-            <Canvas
-              isFinished={isFinished}
-              isSelected={isSelected}
-              ref={puzzleRef}
-              toolsRef={toolsRef}
-              ratio={ratioRef.current}
-              handleMouseDown={handlePointDown}
-              handleSelect={setSelected}
-              handleClose={handleClose}
-              lastDraw={lastDraw}
-            />
-          </div>
-          {!isFinished && (
-            <div
-              className="tools-location"
-              ref={locationBoxRef}
-              onMouseMove={handleLocMove}
-            >
-              <canvas ref={locationRef} width="0" height="0" />
-            </div>
-          )}
+      <div className="img-box">
+        <img src={src} width={size[0]} height={size[1]} alt="加载失败" />
+        <div className="drag-box" ref={cutRef} />
+        <div className="drag-parent" ref={parentRef}>
+          <Canvas
+            isFinished={isFinished}
+            isSelected={isSelected}
+            ref={puzzleRef}
+            toolsRef={toolsRef}
+            ratio={ratioRef.current}
+            handleMouseDown={handlePointDown}
+            handleSelect={setSelected}
+            handleClose={handleClose}
+            lastDraw={lastDraw}
+          />
         </div>
-      ) : (
-        <div className="hold">无图片</div>
-      )}
+        {!isFinished && (
+          <div
+            className="tools-location"
+            ref={locationBoxRef}
+            onMouseMove={handleLocMove}
+          >
+            <canvas ref={locationRef} width="0" height="0" />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
 ImageTools.defaultProps = {
-  shouldResetAfterResize: true
+  locSize: 10,
+  holdSize: { w: '100vw', h: '100vh' }
 };
 
 export default ImageTools;
