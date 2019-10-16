@@ -2,11 +2,12 @@ import * as React from 'react';
 import cx from 'classnames';
 
 interface IProps {
+  isHideColor?: boolean;
   info: { size: number; color: string };
   onChange: ({ size, color }: { size?: number; color?: string }) => void;
 }
 
-const Stroke: React.FC<IProps> = ({ info, onChange }) => {
+const Stroke: React.FC<IProps> = ({ isHideColor, info, onChange }) => {
   return (
     <div className="image-editor-pop">
       <div className="size-item" onClick={() => onChange({ size: 4 })}>
@@ -30,32 +31,40 @@ const Stroke: React.FC<IProps> = ({ info, onChange }) => {
           })}
         />
       </div>
-      <div
-        className={cx('color-item color-yellow', {
-          'tools-color-selected': info.color === '#f1f117'
-        })}
-        onClick={() => onChange({ color: '#f1f117' })}
-      />
-      <div
-        className={cx('color-item color-red', {
-          'tools-color-selected': info.color === '#f71f1f'
-        })}
-        onClick={() => onChange({ color: '#f71f1f' })}
-      />
-      <div
-        className={cx('color-item color-green', {
-          'tools-color-selected': info.color === '#30ca30'
-        })}
-        onClick={() => onChange({ color: '#30ca30' })}
-      />
-      <div
-        className={cx('color-item color-blue', {
-          'tools-color-selected': info.color === '#31e9f9'
-        })}
-        onClick={() => onChange({ color: '#31e9f9' })}
-      />
+      {!isHideColor && (
+        <>
+          <div
+            className={cx('color-item color-yellow', {
+              'tools-color-selected': info.color === '#f1f117'
+            })}
+            onClick={() => onChange({ color: '#f1f117' })}
+          />
+          <div
+            className={cx('color-item color-red', {
+              'tools-color-selected': info.color === '#f71f1f'
+            })}
+            onClick={() => onChange({ color: '#f71f1f' })}
+          />
+          <div
+            className={cx('color-item color-green', {
+              'tools-color-selected': info.color === '#30ca30'
+            })}
+            onClick={() => onChange({ color: '#30ca30' })}
+          />
+          <div
+            className={cx('color-item color-blue', {
+              'tools-color-selected': info.color === '#31e9f9'
+            })}
+            onClick={() => onChange({ color: '#31e9f9' })}
+          />
+        </>
+      )}
     </div>
   );
 };
+
+Stroke.defaultProps = {
+  isHideColor: false
+}
 
 export default Stroke;

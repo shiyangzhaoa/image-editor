@@ -181,7 +181,10 @@
     width: 20px;
     height: 20px;
     box-sizing: border-box;
-    margin-right: 8px;
+
+    &:not(:last-child) {
+      margin-right: 8px;
+    }
   }
 
   .color-item {
@@ -192,6 +195,10 @@
 
     &:not(:last-child) {
       margin-right: 3px;
+    }
+
+    &:first-child {
+      margin-left: 8px;
     }
   }
   
@@ -243,4 +250,9 @@
   .tools-color-selected {
     border: 1px solid #fff;
   }
+}
+
+.image-editor-loading {
+  // 行为保持一致
+  display: flex;
 }

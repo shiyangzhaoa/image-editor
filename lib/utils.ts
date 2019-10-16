@@ -5,6 +5,15 @@ export interface ILoc {
   y: number;
 }
 
+export const rgb2hex = (r: number, g: number, b: number) => {
+  const str1 = r.toString(16);
+  const str2 = g.toString(16);
+  const str3 = b.toString(16);
+  return `#${str1.length < 2 ? '0' + str1 : str1}${
+    str2.length < 2 ? '0' + str2 : str2
+  }${str3.length < 2 ? '0' + str3 : str3}`;
+};
+
 export const getLocInfo = (firstLoc: ILoc, lastLoc: ILoc) => {
   let x: number;
   let y: number;
@@ -394,4 +403,46 @@ export const drawLine = (
   context.lineCap = 'round';
   context.lineJoin = 'round';
   context.stroke();
+};
+
+export const drawMosaic = (
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  // 画笔宽度, 先不做这个功能
+  trackSize = 0
+) => {
+  const pointList: { x: number; y: number, color: string}[] = [];
+  const imgData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+  const w = Math.ceil(context.canvas.width / size);
+  const h = Math.ceil(context.canvas.height / size);
+  const startRow = Math.max(0, Math.floor((x - trackSize) / size));
+  let startCol = Math.max(0, Math.floor((y - trackSize) / size));
+  const endRow = Math.min(w, Math.ceil(x + trackSize) / size);
+  const endCol = Math.min(h, Math.ceil(y + trackSize) / size);
+  while (startCol < endCol) {
+    let row = startRow;
+    while (row < endRow) {
+      row += 1;
+      const index = startCol * w + row;
+      const locX = index % w - 1;
+      const locY = Math.floor(index / w);
+
+      const dataIndex = Math.floor(locY * size * context.canvas.width + locX * size);
+      const r = imgData.data[dataIndex * 4];
+      const g = imgData.data[dataIndex * 4 + 1];
+      const b = imgData.data[dataIndex * 4 + 2];
+      const color = rgb2hex(r, g, b);
+      if (!pointList.find(point => point.x === locX && point.y === locY)) {
+        pointList.push({ x: locX, y: locY, color });
+      }
+    }
+    startCol += 1;
+  }
+
+  pointList.forEach(point => {
+    context.fillStyle = point.color;
+    context.fillRect(point.x * size, point.y * size, size, size);
+  });
 };

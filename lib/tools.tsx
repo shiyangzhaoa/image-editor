@@ -136,7 +136,40 @@ const Tools = forwardRef<HTMLDivElement, IProps>(
             L
           </div>
         </Popover>
-        <div className="tools-item tools-text">M</div>
+        <Popover
+          position={position}
+          align="start"
+          isOpen={selected === 'mosaic'}
+          content={({ position, targetRect, popoverRect }) => (
+            <ArrowContainer
+              position={position}
+              targetRect={targetRect}
+              popoverRect={popoverRect}
+              arrowColor={'#272323'}
+              arrowSize={5}
+            >
+              <Stroke
+                info={info}
+                onChange={options =>
+                  setInfo((opt: { size?: number; color?: string }) => ({
+                    ...opt,
+                    ...options
+                  }))
+                }
+                isHideColor
+              />
+            </ArrowContainer>
+          )}
+        >
+          <div
+            className={cx('tools-item tools-text', {
+              'tool-selected': type === 'mosaic'
+            })}
+            onClick={() => handleClick('mosaic')}
+          >
+            M
+          </div>
+        </Popover>
         <div className="tools-hold" />
         <Back />
         <DownLoad />

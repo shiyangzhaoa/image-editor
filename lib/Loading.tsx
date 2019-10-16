@@ -6,7 +6,7 @@ interface IProps {
 }
 
 const Loading: React.FC<IProps> = (size) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000" style={{...size}}>
+  <svg className="image-editor-loading" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000" style={{...size}}>
     <filter id="b">
       <feGaussianBlur stdDeviation="12" />
     </filter>

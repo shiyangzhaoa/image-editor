@@ -8,7 +8,8 @@ import {
   drawSvg,
   drawSvgOnCanvas,
   ILoc,
-  drawLine
+  drawLine,
+  drawMosaic
 } from './utils';
 import Svg from './Svg';
 import Tools from './Tools';
@@ -142,6 +143,28 @@ const Canvas = forwardRef<any, IProps>(
           };
 
           document.onmouseup = () => {
+            canvasEle.onmousemove = null;
+            document.onmouseup = null;
+          };
+        };
+      }
+
+      if (curType === 'mosaic') {
+        canvasEle.onmousedown = () => {
+          setEdit(true);
+
+          canvasEle.onmousemove = event => {
+            const curLoc = realWindowToCanvas(canvasEle, event.clientX, event.clientY);
+            drawMosaic(
+              canvasEle.getContext('2d'),
+              curLoc.x * ratio,
+              curLoc.y * ratio,
+              infoRef.current.size * ratio
+            );
+          };
+
+          document.onmouseup = () => {
+            setEdit(false);
             canvasEle.onmousemove = null;
             document.onmouseup = null;
           };

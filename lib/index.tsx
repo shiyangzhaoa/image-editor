@@ -105,6 +105,7 @@ const ImageTools: React.FC<IProps> = ({
   }, []);
 
   useEffect(() => {
+    image.crossOrigin = 'anonymous'
     image.src = src;
     setStatus(Status.loading);
   }, [src]);
@@ -423,7 +424,7 @@ const ImageTools: React.FC<IProps> = ({
   }
 
   if (status === Status.failed) {
-    return <ImgFailed />;
+    return <ImgFailed width={width || holdSize.w} height={height || holdSize.h} />;
   }
 
   return (
