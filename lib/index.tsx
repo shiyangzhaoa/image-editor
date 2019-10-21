@@ -18,7 +18,6 @@ import BlockLoading from './Loading';
 import ImgFailed from './img-failed.svg';
 
 interface IProps {
-  /** 如果只是图片 */
   src: string;
   /** 宽度 */
   width?: number;
@@ -27,6 +26,7 @@ interface IProps {
   className?: string;
   locSize: 10;
   holdSize?: { w: number | string; h: number | string };
+  onConfirm?: (url?: string, close?: () => void) => void;
   /** 改变窗口时改变大小, 感觉不需要, 相关代码已经删除 */
   // shouldResetAfterResize?: boolean;
 }
@@ -38,12 +38,14 @@ const ImageTools: React.FC<IProps> = ({
   width,
   height,
   className,
-  holdSize
+  holdSize,
+  onConfirm
 }) => {
   const [status, setStatus] = useState(Status.loading);
   const [size, setSize] = useState<[number, number]>([0, 0]);
   const [isFinished, setFinished] = useState(false);
   const [isSelected, setSelected] = useState(false);
+  // tslint:disable-next-line: no-empty
   const [lastDraw, setLastDraw] = useState<() => void>(() => () => {});
   const cutRef = useRef<HTMLDivElement>(null);
   const puzzleRef = useRef<HTMLCanvasElement>(null);
@@ -442,10 +444,11 @@ const ImageTools: React.FC<IProps> = ({
             ref={puzzleRef}
             toolsRef={toolsRef}
             ratio={ratioRef.current}
+            lastDraw={lastDraw}
             handleMouseDown={handlePointDown}
             handleSelect={setSelected}
             handleClose={handleClose}
-            lastDraw={lastDraw}
+            onConfirm={onConfirm}
           />
         </div>
         {!isFinished && (

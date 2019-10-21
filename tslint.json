@@ -16,7 +16,11 @@
     "trailing-comma": true,
     "max-classes-per-file": [true, 2],
     "object-literal-sort-keys": false,
-    "interface-name": false
+    "interface-name": false,
+    "ordered-imports": false,
+    "curly": false,
+    "no-shadowed-variable": false,
+    "array-type": false
   },
   "linterOptions": {
     "exclude": [

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { forwardRef, useState } from 'react';
+import { forwardRef, useState, SetStateAction } from 'react';
 import Popover, { ArrowContainer } from 'react-tiny-popover';
 import cx from 'classnames';
 
@@ -13,26 +13,29 @@ import Close from './close.svg';
 interface IProps {
   type: string;
   info: { size: number; color: string };
+  setInfo: any;
   onChange: (type: string, options?: { color?: string; size?: number }) => void;
   onClose: () => void;
-  setInfo: any;
+  onCancel: () => void;
+  onDownload: () => void;
+  onCopy: () => void;
 }
 
 const Tools = forwardRef<HTMLDivElement, IProps>(
-  ({ info, onChange, onClose, type, setInfo }, ref) => {
+  ({ type, info, setInfo, onChange, onClose, onCancel, onDownload, onCopy }, ref) => {
     const [selected, setSelected] = useState('');
     const [position, setPosition] = useState<any>('bottom');
     const toolsRef = React.useRef(null);
     const combinedRef = useCombinedRefs(ref, toolsRef) as any;
-    const handleClick = (type: string) => {
+    const handleClick = (curType: string) => {
       const pos = (combinedRef.current as HTMLDivElement).getBoundingClientRect();
       if (pos.bottom >= window.innerHeight - pos.height - 5) {
         setPosition('top');
       } else {
         setPosition('bottom');
       }
-      onChange(type);
-      setSelected(type);
+      onChange(curType);
+      setSelected(curType);
     };
     const handleClose = () => {
       onClose();
@@ -171,10 +174,10 @@ const Tools = forwardRef<HTMLDivElement, IProps>(
           </div>
         </Popover>
         <div className="tools-hold" />
-        <Back />
-        <DownLoad />
+        <Back onClick={onCancel} />
+        <DownLoad onClick={onDownload} />
         <Close onClick={handleClose} />
-        <Confirm className="tools-item" />
+        <Confirm className="tools-item" onClick={onCopy} />
       </div>
     );
   }

@@ -1,18 +1,25 @@
 {
   "name": "image-editor-little",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Image Editor",
   "main": "dist/lib.js",
   "module": "dist/lib.es.js",
   "files": [
     "dist"
   ],
-  "keywords": ["image", "react", "image-editor", "typescript", "component"],
+  "keywords": [
+    "image",
+    "react",
+    "image-editor",
+    "typescript",
+    "component"
+  ],
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
     "build": "rollup -c",
-    "build:watch": "rollup -cw"
+    "build:watch": "rollup -cw",
+    "lint": "tslint --format stylish --project tsconfig.json 'lib/*.ts*(x)'"
   },
   "repository": {
     "type": "git",
@@ -35,11 +42,14 @@
     "rollup-plugin-peer-deps-external": "^2.2.0",
     "rollup-plugin-typescript2": "^0.18.0",
     "ts-import-plugin": "^1.5.5",
+    "tslint": "^5.20.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-react": "^4.1.0",
     "typescript": "^3.1.6"
   },
   "peerDependencies": {
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3"
+    "react": "^16.8.1",
+    "react-dom": "^16.8.1"
   },
   "dependencies": {
     "classnames": "^2.2.6",

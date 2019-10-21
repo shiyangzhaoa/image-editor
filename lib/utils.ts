@@ -429,7 +429,7 @@ export const drawMosaic = (
       const locX = index % w - 1;
       const locY = Math.floor(index / w);
 
-      const dataIndex = Math.floor(locY * size * context.canvas.width + locX * size);
+      const dataIndex = Math.floor(locY * size) * context.canvas.width + Math.floor(locX * size);
       const r = imgData.data[dataIndex * 4];
       const g = imgData.data[dataIndex * 4 + 1];
       const b = imgData.data[dataIndex * 4 + 2];

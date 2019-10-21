@@ -23,7 +23,13 @@ interface IProps {
   handleSelect: any;
   handleClose: any;
   lastDraw: () => void;
+  onConfirm: (url?: string, close?: () => void) => void;
 }
+
+const initInfo = {
+  size: 4,
+  color: '#f1f117'
+};
 
 const Canvas = forwardRef<any, IProps>(
   (
@@ -32,33 +38,26 @@ const Canvas = forwardRef<any, IProps>(
       isSelected,
       toolsRef,
       ratio,
+      lastDraw,
       handleMouseDown,
       handleSelect,
       handleClose,
-      lastDraw
+      onConfirm
     },
     ref
   ) => {
     const [type, setType] = useState('');
     const [size, setSize] = useState<[number, number]>([0, 0]);
     const [isEdit, setEdit] = useState(false);
-    const [info, setInfo] = useState<{ size: number; color: string }>({
-      size: 4,
-      color: '#f1f117'
-    });
+    const [info, setInfo] = useState<{ size: number; color: string }>(initInfo);
     const canvasRef = useRef(null);
     const combinedRef = useCombinedRefs(ref, canvasRef) as any;
     const actionsRef = useRef<any[]>([]);
     const svgRef = useRef<SVGElement>(null);
-    const infoRef = useRef<{ size: number; color: string }>({
-      size: 4,
-      color: '#f1f117'
-    });
+    const infoRef = useRef<{ size: number; color: string }>(initInfo);
     const downLoc = useRef<ILoc>({ x: 0, y: 0 });
-    const curInfo = useRef<{ size: number; color: string }>({
-      size: 4,
-      color: '#f1f117'
-    });
+    const curInfo = useRef<{ size: number; color: string }>(initInfo);
+    const pointListRef = useRef<ILoc[]>([]);
 
     const handleMove = (moveEvent: MouseEvent) => {
       const svgEle = svgRef.current as SVGElement;
@@ -128,12 +127,16 @@ const Canvas = forwardRef<any, IProps>(
         let lastLoc: ILoc;
         canvasEle.onmousedown = event => {
           lastLoc = windowToCanvas(canvasEle, event.clientX, event.clientY);
+          const firstLoc = lastLoc;
           canvasEle.onmousemove = moveEvent => {
             const curLoc = realWindowToCanvas(
               canvasEle,
               moveEvent.clientX,
               moveEvent.clientY
             );
+
+            pointListRef.current = pointListRef.current.concat(curLoc);
+
             const context = canvasEle.getContext(
               '2d'
             ) as CanvasRenderingContext2D;
@@ -145,6 +148,25 @@ const Canvas = forwardRef<any, IProps>(
           document.onmouseup = () => {
             canvasEle.onmousemove = null;
             document.onmouseup = null;
+
+            // draw history
+            const drawAction = (points => {
+              const _info = curInfo.current;
+              return () => {
+                const context = canvasEle.getContext(
+                  '2d'
+                ) as CanvasRenderingContext2D;
+                points.reduce((acc, cur) => {
+                  drawLine(acc, cur, context, ratio, _info);
+  
+                  return cur;
+                }, firstLoc);
+              };
+            })(pointListRef.current);
+
+            actionsRef.current = [...actionsRef.current, drawAction];
+
+            pointListRef.current = [];
           };
         };
       }
@@ -171,6 +193,7 @@ const Canvas = forwardRef<any, IProps>(
         };
       }
     };
+
     const handleToolsClose = () => {
       handleClose();
       setType('');
@@ -180,6 +203,39 @@ const Canvas = forwardRef<any, IProps>(
       canvasEle.onmousedown = null;
       canvasEle.onmousemove = null;
       document.onmouseup = null;
+    };
+
+    const handleCancel = () => {
+      const curActions = actionsRef.current.slice(0, -1);
+
+      if (!curActions.length) return;
+
+      
+      curActions.forEach(action => action());
+      actionsRef.current = curActions;
+    };
+
+    const handleDownload = () => {
+      const canvasEle = combinedRef.current as HTMLCanvasElement;
+      const urlData = canvasEle.toDataURL('image/png');
+      const aEle = document.createElement('a');
+      aEle.href = urlData;
+      aEle.download = 'image-editor';
+      document.body.appendChild(aEle);
+      aEle.click();
+      aEle.remove();
+    }
+
+    const handleCopy = () => {
+      const canvasEle = combinedRef.current as HTMLCanvasElement;
+      const urlData = canvasEle.toDataURL('image/png');
+      if (typeof onConfirm === 'function') {
+        onConfirm(urlData, handleToolsClose);
+
+        return;
+      }
+
+      handleToolsClose();
     };
 
     useEffect(() => {
@@ -223,35 +279,35 @@ const Canvas = forwardRef<any, IProps>(
             <div
               className="left-top point"
               onMouseDown={() => handleMouseDown(3)}
-            ></div>
+            />
             <div
               className="center-top point"
               onMouseDown={() => handleMouseDown(3, 'vertical')}
-            ></div>
+            />
             <div
               className="right-top point"
               onMouseDown={() => handleMouseDown(2)}
-            ></div>
+            />
             <div
               className="left-center point"
               onMouseDown={() => handleMouseDown(1, 'horizontal')}
-            ></div>
+            />
             <div
               className="right-center point"
               onMouseDown={() => handleMouseDown(0, 'horizontal')}
-            ></div>
+            />
             <div
               className="left-bottom point"
               onMouseDown={() => handleMouseDown(1)}
-            ></div>
+            />
             <div
               className="center-bottom point"
               onMouseDown={() => handleMouseDown(0, 'vertical')}
-            ></div>
+            />
             <div
               className="right-bottom point"
               onMouseDown={() => handleMouseDown(0)}
-            ></div>
+            />
           </>
         )}
         {isFinished && (
@@ -259,9 +315,12 @@ const Canvas = forwardRef<any, IProps>(
             ref={toolsRef}
             type={type}
             info={info}
-            onChange={handleChange}
             setInfo={setInfo}
+            onChange={handleChange}
             onClose={handleToolsClose}
+            onCancel={handleCancel}
+            onDownload={handleDownload}
+            onCopy={handleCopy}
           />
         )}
       </div>
