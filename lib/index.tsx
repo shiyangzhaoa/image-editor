@@ -24,7 +24,7 @@ interface IProps {
   /** 高度 */
   height?: number;
   className?: string;
-  locSize: 10;
+  locSize?: number;
   holdSize?: { w: number | string; h: number | string };
   onConfirm?: (url?: string, close?: () => void) => void;
   /** 改变窗口时改变大小, 感觉不需要, 相关代码已经删除 */
