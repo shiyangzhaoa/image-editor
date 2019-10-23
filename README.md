@@ -30,6 +30,12 @@ import ImageEditor from 'image-editor-little';
 ## online
 [![image-editor-little-demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/embed/youthful-visvesvaraya-11iv1)
 
+## 为你的网页添加截图
+
+简单的例子, 目前不会加这个功能, 不想依赖 html2canvas
+
+[![image-editor-little-demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/embed/falling-dream-6vwqt)
+
 ## api
 
 | 参数 | 说明 | 类型 | 默认值 | 是否必填 |
