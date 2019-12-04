@@ -26,6 +26,8 @@ interface IProps {
   className?: string;
   locSize?: number;
   holdSize?: { w: number | string; h: number | string };
+  /** 点击 X 触发 */
+  onClose?: (close?: () => void) => void;
   onConfirm?: (url?: string, close?: () => void) => void;
   /** 改变窗口时改变大小, 感觉不需要, 相关代码已经删除 */
   // shouldResetAfterResize?: boolean;
@@ -39,6 +41,7 @@ const ImageTools: React.FC<IProps> = ({
   height,
   className,
   holdSize,
+  onClose,
   onConfirm
 }) => {
   const [status, setStatus] = useState(Status.loading);
@@ -448,6 +451,7 @@ const ImageTools: React.FC<IProps> = ({
             handleMouseDown={handlePointDown}
             handleSelect={setSelected}
             handleClose={handleClose}
+            onClose={onClose}
             onConfirm={onConfirm}
           />
         </div>

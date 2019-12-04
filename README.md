@@ -46,4 +46,5 @@ import ImageEditor from 'image-editor-little';
 | className| 自定义类名 | `string` | - | 否 |
 | locSize| 放大镜大小(x 10) | `number` | 10 | 否 |
 | holdSize| 图片加载时, 占位 svg 宽高 | `object` | { w: '100vw', h: '100vh' } | 否 |
+| onClose | 点击 X 触发 | (close: Function) => void | - | 否 |
 | onConfirm| 点击确认触发 | `(url?: string, close?: () => void) => void` | - | 否 |

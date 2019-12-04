@@ -23,6 +23,7 @@ interface IProps {
   handleSelect: any;
   handleClose: any;
   lastDraw: () => void;
+  onClose?: (close?: () => void) => void;
   onConfirm: (url?: string, close?: () => void) => void;
 }
 
@@ -42,6 +43,7 @@ const Canvas = forwardRef<any, IProps>(
       handleMouseDown,
       handleSelect,
       handleClose,
+      onClose,
       onConfirm
     },
     ref
@@ -205,6 +207,16 @@ const Canvas = forwardRef<any, IProps>(
       document.onmouseup = null;
     };
 
+    const handleCloseClick = () => {
+      if (typeof onClose === 'function') {
+        onClose(handleToolsClose);
+
+        return;
+      }
+
+      handleToolsClose();
+    };
+
     const handleCancel = () => {
       const curActions = actionsRef.current.slice(0, -1);
 
@@ -240,6 +252,7 @@ const Canvas = forwardRef<any, IProps>(
 
     useEffect(() => {
       infoRef.current = info;
+      curInfo.current = info;
     }, [info]);
 
     useEffect(() => {
@@ -256,10 +269,6 @@ const Canvas = forwardRef<any, IProps>(
         };
       }
     }, [type, isEdit, handleMove]);
-
-    useEffect(() => {
-      curInfo.current = info;
-    }, [info]);
 
     return (
       <div className="drag-border">
@@ -317,7 +326,7 @@ const Canvas = forwardRef<any, IProps>(
             info={info}
             setInfo={setInfo}
             onChange={handleChange}
-            onClose={handleToolsClose}
+            onClose={handleCloseClick}
             onCancel={handleCancel}
             onDownload={handleDownload}
             onCopy={handleCopy}
