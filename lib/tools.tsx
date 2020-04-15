@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { forwardRef, useState, SetStateAction } from 'react';
+import { forwardRef, useState } from 'react';
 import Popover, { ArrowContainer } from 'react-tiny-popover';
 import cx from 'classnames';
 

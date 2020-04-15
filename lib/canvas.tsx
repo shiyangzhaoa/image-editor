@@ -9,7 +9,8 @@ import {
   drawSvgOnCanvas,
   ILoc,
   drawLine,
-  drawMosaic
+  drawMosaic,
+  getFileName
 } from './utils';
 import Svg from './Svg';
 import Tools from './Tools';
@@ -19,11 +20,13 @@ interface IProps {
   isSelected: boolean;
   toolsRef: React.RefObject<HTMLDivElement>;
   ratio: number;
+  imageType?: string;
   handleMouseDown: any;
   handleSelect: any;
   handleClose: any;
   lastDraw: () => void;
   onClose?: (close?: () => void) => void;
+  onDownload?: (close?: () => void) => void;
   onConfirm: (url?: string, close?: () => void) => void;
 }
 
@@ -39,11 +42,13 @@ const Canvas = forwardRef<any, IProps>(
       isSelected,
       toolsRef,
       ratio,
+      imageType,
       lastDraw,
       handleMouseDown,
       handleSelect,
       handleClose,
       onClose,
+      onDownload,
       onConfirm
     },
     ref
@@ -229,18 +234,24 @@ const Canvas = forwardRef<any, IProps>(
 
     const handleDownload = () => {
       const canvasEle = combinedRef.current as HTMLCanvasElement;
-      const urlData = canvasEle.toDataURL('image/png');
+      const urlData = canvasEle.toDataURL(`image/${imageType}`);
       const aEle = document.createElement('a');
       aEle.href = urlData;
-      aEle.download = 'image-editor';
+      aEle.download = getFileName();
       document.body.appendChild(aEle);
       aEle.click();
       aEle.remove();
+
+      if (typeof onDownload === 'function') {
+        onDownload(handleToolsClose);
+
+        return;
+      }
     }
 
     const handleCopy = () => {
       const canvasEle = combinedRef.current as HTMLCanvasElement;
-      const urlData = canvasEle.toDataURL('image/png');
+      const urlData = canvasEle.toDataURL(`image/${imageType}`);
       if (typeof onConfirm === 'function') {
         onConfirm(urlData, handleToolsClose);
 

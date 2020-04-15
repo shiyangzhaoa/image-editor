@@ -1,6 +1,6 @@
 {
   "name": "image-editor-little",
-  "version": "0.1.4-beta",
+  "version": "0.1.4",
   "description": "Image Editor",
   "main": "dist/lib.js",
   "module": "dist/lib.es.js",
