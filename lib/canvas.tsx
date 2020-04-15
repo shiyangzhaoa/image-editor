@@ -9,7 +9,8 @@ import {
   drawSvgOnCanvas,
   ILoc,
   drawLine,
-  drawMosaic
+  drawMosaic,
+  getFileName
 } from './utils';
 import Svg from './Svg';
 import Tools from './Tools';
@@ -24,6 +25,7 @@ interface IProps {
   handleClose: any;
   lastDraw: () => void;
   onClose?: (close?: () => void) => void;
+  onDownload?: (close?: () => void) => void;
   onConfirm: (url?: string, close?: () => void) => void;
 }
 
@@ -44,6 +46,7 @@ const Canvas = forwardRef<any, IProps>(
       handleSelect,
       handleClose,
       onClose,
+      onDownload,
       onConfirm
     },
     ref
@@ -232,10 +235,16 @@ const Canvas = forwardRef<any, IProps>(
       const urlData = canvasEle.toDataURL('image/png');
       const aEle = document.createElement('a');
       aEle.href = urlData;
-      aEle.download = 'image-editor';
+      aEle.download = getFileName();
       document.body.appendChild(aEle);
       aEle.click();
       aEle.remove();
+
+      if (typeof onDownload === 'function') {
+        onDownload(handleToolsClose);
+
+        return;
+      }
     }
 
     const handleCopy = () => {

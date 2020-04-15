@@ -5,6 +5,26 @@ export interface ILoc {
   y: number;
 }
 
+export const getFileName = (cacheMap => () => {
+  let name = '';
+  const fn = () => {
+    name = '';
+    for (let i = 0; i < 16; i++) {
+      name += String.fromCharCode(Math.floor(Math.random() * 10) + 65).toLocaleLowerCase();
+    }
+
+    return name;
+  };
+
+  fn();
+
+  while (cacheMap.has(name)) {
+    fn();
+  };
+
+  return name;
+})(new Map());
+
 export const rgb2hex = (r: number, g: number, b: number) => {
   const str1 = r.toString(16);
   const str2 = g.toString(16);
