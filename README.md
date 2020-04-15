@@ -49,7 +49,7 @@ import ImageEditor from 'image-editor-little';
 | height| 高度 | `number` | - | 否 |
 | className| 自定义类名 | `string` | - | 否 |
 | imageType | 下载图片格式类型 | `string` | `png` | 否 |
-| locSize| 放大镜大小(x 10) | `number` | 10 | 否 |
+| locSize| 放大镜大小(x 10) | `number` | `10` | 否 |
 | holdSize| 图片加载时, 占位 svg 宽高 | `object` | `{ w: '100vw', h: '100vh' }` | 否 |
 | onClose | 点击 X 触发 | `(close: Function) => void` | - | 否 |
 | onDownload | 点击下载触发 | `(close: Function) => void` | - | 否 |
