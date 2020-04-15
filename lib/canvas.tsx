@@ -20,6 +20,7 @@ interface IProps {
   isSelected: boolean;
   toolsRef: React.RefObject<HTMLDivElement>;
   ratio: number;
+  imageType?: string;
   handleMouseDown: any;
   handleSelect: any;
   handleClose: any;
@@ -41,6 +42,7 @@ const Canvas = forwardRef<any, IProps>(
       isSelected,
       toolsRef,
       ratio,
+      imageType,
       lastDraw,
       handleMouseDown,
       handleSelect,
@@ -232,7 +234,7 @@ const Canvas = forwardRef<any, IProps>(
 
     const handleDownload = () => {
       const canvasEle = combinedRef.current as HTMLCanvasElement;
-      const urlData = canvasEle.toDataURL('image/png');
+      const urlData = canvasEle.toDataURL(`image/${imageType}`);
       const aEle = document.createElement('a');
       aEle.href = urlData;
       aEle.download = getFileName();
@@ -249,7 +251,7 @@ const Canvas = forwardRef<any, IProps>(
 
     const handleCopy = () => {
       const canvasEle = combinedRef.current as HTMLCanvasElement;
-      const urlData = canvasEle.toDataURL('image/png');
+      const urlData = canvasEle.toDataURL(`image/${imageType}`);
       if (typeof onConfirm === 'function') {
         onConfirm(urlData, handleToolsClose);
 

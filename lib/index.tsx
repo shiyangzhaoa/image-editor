@@ -26,8 +26,12 @@ interface IProps {
   className?: string;
   locSize?: number;
   holdSize?: { w: number | string; h: number | string };
+  /** 下载图片的类型 */
+  imageType?: string;
   /** 点击 X 触发 */
   onClose?: (close?: () => void) => void;
+  /** 点击下载时触发 */
+  onDownload?: (close?: () => void) => void;
   onConfirm?: (url?: string, close?: () => void) => void;
   /** 改变窗口时改变大小, 感觉不需要, 相关代码已经删除 */
   // shouldResetAfterResize?: boolean;
@@ -41,7 +45,9 @@ const ImageTools: React.FC<IProps> = ({
   height,
   className,
   holdSize,
+  imageType,
   onClose,
+  onDownload,
   onConfirm
 }) => {
   const [status, setStatus] = useState(Status.loading);
@@ -447,11 +453,13 @@ const ImageTools: React.FC<IProps> = ({
             ref={puzzleRef}
             toolsRef={toolsRef}
             ratio={ratioRef.current}
+            imageType={imageType}
             lastDraw={lastDraw}
             handleMouseDown={handlePointDown}
             handleSelect={setSelected}
             handleClose={handleClose}
             onClose={onClose}
+            onDownload={onDownload}
             onConfirm={onConfirm}
           />
         </div>
@@ -471,6 +479,7 @@ const ImageTools: React.FC<IProps> = ({
 
 ImageTools.defaultProps = {
   locSize: 10,
+  imageType: 'png',
   holdSize: { w: '100vw', h: '100vh' }
 };
 
