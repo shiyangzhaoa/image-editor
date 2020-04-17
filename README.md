@@ -36,7 +36,7 @@ import ImageEditor from 'image-editor-little';
 
 ## 网页截图
 
-简单的例子, 目前不会加这个功能, 不想依赖 html2canvas
+给网页添加截图功能, 目前不会加这个功能, 不想依赖 html2canvas
 
 [![image-editor-little-demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/embed/falling-dream-6vwqt)
 
@@ -51,6 +51,6 @@ import ImageEditor from 'image-editor-little';
 | imageType | 下载图片格式类型 | `string` | `png` | 否 |
 | locSize| 放大镜大小(x 10) | `number` | `10` | 否 |
 | holdSize| 图片加载时, 占位 svg 宽高 | `object` | `{ w: '100vw', h: '100vh' }` | 否 |
-| onClose | 点击 X 触发 | `(close: Function) => void` | - | 否 |
-| onDownload | 点击下载触发 | `(close: Function) => void` | - | 否 |
+| onClose | 点击 X 触发 | `(close: () => void) => void` | - | 否 |
+| onDownload | 点击下载触发 | `(close: () => void) => void` | - | 否 |
 | onConfirm| 点击确认触发 | `(url?: string, close?: () => void) => void` | - | 否 |
