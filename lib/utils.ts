@@ -10,7 +10,7 @@ export const getFileName = (cacheMap => () => {
   const fn = () => {
     name = '';
     for (let i = 0; i < 16; i++) {
-      name += String.fromCharCode(Math.floor(Math.random() * 10) + 65).toLocaleLowerCase();
+      name += String.fromCharCode(Math.floor(Math.random() * 26) + 65).toLocaleLowerCase();
     }
 
     return name;
@@ -21,6 +21,7 @@ export const getFileName = (cacheMap => () => {
   while (cacheMap.has(name)) {
     fn();
   };
+  cacheMap.set(name, true);
 
   return name;
 })(new Map());
