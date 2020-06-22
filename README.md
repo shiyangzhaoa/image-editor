@@ -40,6 +40,8 @@ import ImageEditor from 'image-editor-little';
 
 [![image-editor-little-demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/keen-wildflower-8rrwt)
 
+⚠️ [Iframes 禁止下载](https://www.chromestatus.com/feature/5706745674465280)
+
 ## 网页截图
 
 给网页添加截图功能, 目前不会加这个功能, 不想依赖 html2canvas
